@@ -1,0 +1,14 @@
+
+services:
+  coding_agent:
+    build: .
+    container_name: aca_sandbox_agent
+    environment: 
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    volumes:
+      - .:/app
+      - ./ai_workspace:/app/ai_workspace
+    ports:
+      - "8000:8000"  # Maps Windows Port 8000 to Docker Port 8000  
+    tty: true
+    stdin_open : true  

@@ -1,0 +1,17 @@
+langchain-openai
+langgraph
+langchain
+pytest
+streamlit
+pandas
+numpy
+requests
+beautifulsoup4
+python-dotenv
+pydantic
+SQLAlchemy
+fastapi
+uvicorn
+pymongo
+tiktoken
+langgraph-checkpoint-mongodb
