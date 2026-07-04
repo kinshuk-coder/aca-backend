@@ -20,16 +20,23 @@ app.add_middleware(
 
 class user_query(BaseModel):
     message : str
+    thread_id : str
 
 @app.post("/api/chat")
 async def chat(query : user_query):
     input = query.message
 
+    config = {
+        "configurable": {
+            "thread_id":query.thread_id
+        }
+    }
+
     async def streaming_event():
 
         try:
 
-            for event in ai_agent.stream({"messages":[HumanMessage(input)]}):
+            for event in ai_agent.stream({"messages":[HumanMessage(input)]},config=config):
 
                 for node_name,state_update in event.items():
                     new_message = state_update.get("messages",[])

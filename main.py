@@ -3,13 +3,18 @@ import subprocess
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
+from pymongo import MongoClient
+from langgraph.checkpoint.mongodb import MongoDBSaver
 
 
 llm = ChatOpenAI(api_key=os.getenv("MISTRAL_API_KEY"),
              base_url="https://api.mistral.ai/v1",
              model="codestral-2508",
              temperature=0.2)
+
+mongo_client = MongoClient(os.getenv("MONGO_URI"))
+
+mongo_saver = MongoDBSaver(mongo_client,db_name="aca_db")
 
 @tool
 def write_file(file_path : str , content : str) -> str :
@@ -63,38 +68,10 @@ system_instructions = ("You are an elite, autonomous Senior Python Developer age
 
 ai_agent = create_agent(model=llm,
                      system_prompt=system_instructions,
-                     tools=tools).with_config({"recursion_limit":50})
+                     tools=tools,
+                     checkpointer=mongo_saver
+                     ).with_config({"recursion_limit":50})
 
 
 
-
-'''for chunk in ai_agent.stream({"messages":[HumanMessage(content="Create a simple web dashboard using Streamlit or Flask that displays a 'Hello World' header.")]}):
-
-    for node_name, state in chunk.items():
-
-        if(node_name=='agent' or node_name=='model'):
-
-            msg = state['messages'][-1]
-
-            if(msg.content):
-                print(f"Agent's message : {msg.content}")
-
-            if(hasattr(msg,'tool_calls') and len(msg.tool_calls)>0):
-                for tool in msg.tool_calls:
-                    print(f"Agent calling : {tool['name']}" ) 
-                    print (f"Arguments of tool : {tool['args']}")   
-
-        elif (node_name=='tools'):
-            msg = state['messages'][-1]
-            print (f"Tool called : {msg.content}")
-
-    print ('='*40)   
-    '''     
-
-
-
-
-
-
-    
 

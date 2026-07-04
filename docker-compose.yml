@@ -5,6 +5,7 @@ services:
     container_name: aca_sandbox_agent
     environment: 
       - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - MONGO_URI=${MONGO_URI}
     volumes:
       - .:/app
       - ./ai_workspace:/app/ai_workspace
