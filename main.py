@@ -5,12 +5,24 @@ from langchain_core.tools import tool
 from langchain.agents import create_agent
 from pymongo import MongoClient
 from langgraph.checkpoint.mongodb import MongoDBSaver
+from langchain.agents.middleware import SummarizationMiddleware
 
 
 llm = ChatOpenAI(api_key=os.getenv("MISTRAL_API_KEY"),
              base_url="https://api.mistral.ai/v1",
-             model="codestral-2508",
+             model="devstral-2512",
              temperature=0.2)
+
+sum_llm = ChatOpenAI(api_key=os.getenv("MISTRAL_API_KEY"),
+             base_url="https://api.mistral.ai/v1",
+             model="mistral-small-2506",
+             temperature=0.0)
+
+context_summarizer = SummarizationMiddleware(
+    model=sum_llm,
+    trigger=("tokens",30000),
+    keep=("messages",10),
+)
 
 mongo_client = MongoClient(os.getenv("MONGO_URI"))
 
@@ -61,15 +73,14 @@ system_instructions = ("You are an elite, autonomous Senior Python Developer age
     "- Strongly prefer Python's standard library (`json`, `csv`, `os`, `re`, `sqlite3`, etc.) before installing third-party packages.\n"
     "- If you MUST install a third-party package, you MUST use `uv pip install <package>` instead of standard pip to prevent timeouts.\n"
     "- Once you have successfully executed the code and verified the logic works, stop.\n" 
-    "- NEVER attempt to test the frontend applications like Streamlit, Gradio, Reflex, etc. as they will crash the execution thread, instead just write the code for these apps and stop.\n"
-    "- NEVER attempt to run the backend servers like Fastapi, Flask, Django, etc. as they will crash the execution thread, instead just write the code for these apps and stop.\n" 
     "- NEVER attempt to install or use heavy machine learning libraries like PyTorch, TensorFlow, Scikit-learn or Keras.\n"
     "- If the user asks for AI or ML features, you MUST use external APIs via the `requests` library.")
 
 ai_agent = create_agent(model=llm,
                      system_prompt=system_instructions,
                      tools=tools,
-                     checkpointer=mongo_saver
+                     checkpointer=mongo_saver,
+                     middleware=[context_summarizer]
                      ).with_config({"recursion_limit":50})
 
 

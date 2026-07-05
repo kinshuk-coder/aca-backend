@@ -39,6 +39,8 @@ async def chat(query : user_query):
             for event in ai_agent.stream({"messages":[HumanMessage(input)]},config=config):
 
                 for node_name,state_update in event.items():
+                    if not state_update or not isinstance(state_update, dict):
+                        continue
                     new_message = state_update.get("messages",[])
                     if not isinstance(new_message, list):
                         new_message = [new_message]
@@ -61,6 +63,68 @@ async def chat(query : user_query):
 
         
 
-    return StreamingResponse(streaming_event(),media_type="text/event-stream")                    
+    return StreamingResponse(streaming_event(),media_type="text/event-stream")           
 
+class HistoryQuery(BaseModel):
+    thread_id : str
 
+@app.post("/api/get_history")
+def get_history(query : HistoryQuery):
+
+    config = {
+        "configurable":{
+            "thread_id":query.thread_id
+        }
+    }
+
+    try:
+
+        state = ai_agent.get_state(config=config)
+
+        if not state.values:
+            return {"messages":[]}
+        
+        messages = state.values["messages"]
+
+        formatted_messages = []
+
+        for msg in messages:
+
+            if isinstance(msg,HumanMessage):
+                formatted_messages.append({
+                    "role":"user",
+                    "type":"message",
+                    "content":msg.content
+                })
+            elif isinstance(msg,AIMessage):
+
+                if(msg.content):
+                    formatted_messages.append({
+                        "role":"assistant",
+                        "type":"message",
+                        "content":msg.content
+                    })
+
+                if hasattr(msg,"tool_calls") and msg.tool_calls:
+                    formatted_messages.append({
+                        "role":"assistant",
+                        "type":"action",
+                        "content":msg.tool_calls
+                    })
+
+                    
+
+            elif isinstance(msg,ToolMessage):
+
+                formatted_messages.append({
+                    "role":"assistant",
+                    "type":"tool_result",
+                    "name":msg.name,
+                    "content":msg.content
+                })
+
+        return {"messages":formatted_messages}                
+                
+    except Exception as e:
+        print("Error generating history : ",str(e))
+        return ({"error":str(e)})
