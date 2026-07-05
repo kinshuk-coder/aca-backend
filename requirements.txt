@@ -13,5 +13,4 @@ SQLAlchemy
 fastapi
 uvicorn
 pymongo
-tiktoken
 langgraph-checkpoint-mongodb
