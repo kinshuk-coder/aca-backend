@@ -18,4 +18,4 @@ RUN uv pip install --system --no-cache-dir -r requirements.txt
 COPY . .
 
 
-CMD ["uvicorn", "backend2:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend:app", "--host", "0.0.0.0", "--port", "8000"]
