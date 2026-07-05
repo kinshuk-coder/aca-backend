@@ -81,9 +81,10 @@ def get_history(query : HistoryQuery):
 
         state = ai_agent.get_state(config=config)
 
-        if not state.values:
-            return {"messages":[]}
-        
+        # FIX: Safely catch if state or state.values is completely None
+        if not state or not getattr(state, "values", None):
+            return {"messages": []}
+                
         messages = state.values["messages"]
 
         formatted_messages = []
