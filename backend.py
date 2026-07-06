@@ -52,11 +52,13 @@ async def chat(query : user_query):
                         if isinstance(msg,AIMessage) and hasattr(msg,"tool_calls") and msg.tool_calls:
                             yield f"data: {json.dumps({'type' : 'action','content':msg.tool_calls })}\n\n"
 
-                        elif isinstance(msg,AIMessage) and hasattr(msg,"content"):
+                        if isinstance(msg,ToolMessage):
+                            yield f"data: {json.dumps({'type':'tool_result','name':msg.name,'content':msg.content})}\n\n"    
+
+                        if isinstance(msg,AIMessage) and hasattr(msg,"content"):
                             yield f"data: {json.dumps({'type':'message','content':msg.content})}\n\n"  
 
-                        elif isinstance(msg,ToolMessage):
-                            yield f"data: {json.dumps({'type':'tool_result','name':msg.name,'content':msg.content})}\n\n"
+                        
 
         except Exception as e:
             yield f"data: {json.dumps({'type':'error','content':str(e)})}\n\n"                    
