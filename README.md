@@ -47,7 +47,7 @@ The repository comes configured with a dual-layer local environment configuratio
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/kinshuk-coder/aca-backend.git](https://github.com/kinshuk-coder/aca-backend.git)
+   git clone https://github.com/kinshuk-coder/aca-backend.git
    cd aca-backend
    ```
 
@@ -67,6 +67,6 @@ The deployment pipeline relies on the custom container definitions built nativel
 
 To manually deploy changes directly to Hugging Face:
 ```bash
-git remote add huggingface [https://huggingface.co/spaces/kinshuk7/aca-backend](https://huggingface.co/spaces/kinshuk7/aca-backend)
+git remote add huggingface https://huggingface.co/spaces/kinshuk7/aca-backend
 git push huggingface main
 ```
