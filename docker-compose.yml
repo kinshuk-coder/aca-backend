@@ -10,6 +10,6 @@ services:
       - .:/app
       - ./ai_workspace:/app/ai_workspace
     ports:
-      - "8000:8000"  # Maps Windows Port 8000 to Docker Port 8000  
+      - "8000:7860"  # Maps Windows Port 8000 to Docker Port 7860  
     tty: true
     stdin_open : true  
