@@ -10,12 +10,12 @@ from langchain.agents.middleware import SummarizationMiddleware
 
 llm = ChatOpenAI(api_key=os.getenv("MISTRAL_API_KEY"),
              base_url="https://api.mistral.ai/v1",
-             model="devstral-2512",
+             model="mistral-medium-latest",
              temperature=0.2)
 
 sum_llm = ChatOpenAI(api_key=os.getenv("MISTRAL_API_KEY"),
              base_url="https://api.mistral.ai/v1",
-             model="mistral-small-2506",
+             model="mistral-small-2603",
              temperature=0.0)
 
 context_summarizer = SummarizationMiddleware(
